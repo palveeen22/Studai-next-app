@@ -53,15 +53,15 @@ app → pages → widgets → features → entities → shared
 ### 1. Clone and install
 
 ```bash
-git clone <repo-url>
-cd studai
-npm install
+git clone https://github.com/palveeen22/Studai-next-app.git
+cd Studai-next-app
+pnpm install
 ```
 
 ### 2. Configure environment
 
 ```bash
-cp .env.local.example .env.local
+cp .env.local
 ```
 
 Edit `.env.local` with your credentials:
@@ -82,7 +82,7 @@ GEMINI_API_KEY=your_gemini_api_key
 ### 4. Run development server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open http://localhost:3000
@@ -92,7 +92,7 @@ Open http://localhost:3000
 Tests use Jest and cover RTK slices, utility functions, entity helpers, constants, and API endpoint contracts.
 
 ```bash
-npx jest
+pnpm exec jest
 ```
 
 Test files:
@@ -153,4 +153,3 @@ src/
 ## License
 
 MIT
-# Studai-next-app
