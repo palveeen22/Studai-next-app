@@ -14,7 +14,7 @@ export const IconContent = ({
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
-      className="flex items-center justify-center text-8xl"
+      className="flex items-center justify-center text-[120px]"
     >
       {iconText}
     </motion.div>

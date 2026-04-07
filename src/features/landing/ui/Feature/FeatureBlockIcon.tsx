@@ -1,7 +1,6 @@
 'use client';
 
 import { IconContent } from './IconContent';
-import { ImageContent } from './ImageContent';
 import { TextContent } from './TextContent';
 
 interface TProps {
