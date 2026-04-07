@@ -1,6 +1,8 @@
 'use client';
 
 import { getInitials } from '@/shared/lib/utils';
+import Image from "next/image";
+
 
 interface UserAvatarProps {
   name: string;
@@ -15,19 +17,28 @@ const sizeClasses = {
   lg: 'h-16 w-16 text-lg',
 };
 
-export function UserAvatar({ name, avatarUrl, size = 'md', className }: UserAvatarProps) {
+
+export function UserAvatar({
+  name,
+  avatarUrl,
+  size = "md",
+  className,
+}: UserAvatarProps) {
   if (avatarUrl) {
     return (
-      <img
+      <Image
         src={avatarUrl}
         alt={name}
-        className={`rounded-full object-cover ${sizeClasses[size]} ${className || ''}`}
+        width={48}
+        height={48}
+        className={`rounded-full object-cover ${sizeClasses[size]} ${className || ""}`}
       />
     );
   }
+
   return (
     <div
-      className={`flex items-center justify-center rounded-full bg-[#F5C542] text-[#2D2D2D] font-semibold ${sizeClasses[size]} ${className || ''}`}
+      className={`flex items-center justify-center rounded-full bg-[#F5C542] text-[#2D2D2D] font-semibold ${sizeClasses[size]} ${className || ""}`}
     >
       {getInitials(name)}
     </div>
