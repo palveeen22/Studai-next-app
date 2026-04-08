@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, ArrowRight, Lock } from 'lucide-react';
 import type { QuizQuestion, PreparationGoal } from '@/shared/types';
 import { DAILY_QUIZ } from '@/shared/constants';
 import { cn } from '@/shared/lib/utils';
 import { ButtonCustom } from '@/shared/ui/buttonCustom';
 import { Textarea, Label } from '@/shared/ui/components';
 import { QuizOption, QuizScoreCard, QuizProgress } from '@/entities/quiz';
+import { useAIGate } from '@/features/subscription/hooks/useAIGate';
 
 // ============================================
 // QuizInputPanel
@@ -117,12 +118,16 @@ interface QuizPlayViewProps {
   onComplete: (score: number) => void;
 }
 
+const FREE_EXPLANATIONS = 2;
+
 export function QuizPlayView({ questions, onComplete }: QuizPlayViewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [explanationsUsed, setExplanationsUsed] = useState(0);
+  const { isPremium } = useAIGate();
 
   const question = questions[currentIndex];
   const isLast = currentIndex === questions.length - 1;
@@ -137,6 +142,7 @@ export function QuizPlayView({ questions, onComplete }: QuizPlayViewProps) {
 
     if (!revealed) {
       setRevealed(true);
+      setExplanationsUsed((n) => n + 1);
       if (selectedOption === question.correctIndex) setScore((s) => s + 1);
       return;
     }
@@ -194,21 +200,34 @@ export function QuizPlayView({ questions, onComplete }: QuizPlayViewProps) {
         </div>
 
         {/* Explanation */}
-        {revealed && question.explanation && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'rounded-2xl p-4 text-sm font-medium border-2',
-              isCorrect
-                ? 'bg-[#F0FDF4] border-[#58CC02]/30 text-[#166534]'
-                : 'bg-[#FFF8F0] border-[#FF9600]/30 text-[#7C3A00]'
-            )}
-          >
-            <p className="font-extrabold mb-1">{isCorrect ? '✅ Correct!' : '❌ Not quite'}</p>
-            {question.explanation}
-          </motion.div>
-        )}
+        {revealed && question.explanation && (() => {
+          const isLocked = !isPremium && explanationsUsed > FREE_EXPLANATIONS;
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={cn(
+                'relative rounded-2xl p-4 text-sm font-medium border-2 overflow-hidden',
+                isCorrect
+                  ? 'bg-[#F0FDF4] border-[#58CC02]/30 text-[#166534]'
+                  : 'bg-[#FFF8F0] border-[#FF9600]/30 text-[#7C3A00]'
+              )}
+            >
+              <div className={cn(isLocked && 'blur-[6px] opacity-40 select-none pointer-events-none')}>
+                <p className="font-extrabold mb-1">{isCorrect ? '✅ Correct!' : '❌ Not quite'}</p>
+                {question.explanation}
+              </div>
+              {isLocked && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/30 backdrop-blur-[1px]">
+                  <div className="flex items-center gap-2 rounded-xl bg-[#27355B] px-4 py-2.5 shadow-lg">
+                    <Lock className="h-4 w-4 text-[#F5C542]" />
+                    <span className="text-xs font-extrabold text-white">Get Premium to unlock</span>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          );
+        })()}
 
         {/* CTA */}
         <ButtonCustom

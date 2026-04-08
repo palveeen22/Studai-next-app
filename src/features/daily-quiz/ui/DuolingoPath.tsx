@@ -17,9 +17,9 @@ type NodeType = 'star' | 'chest' | 'crown' | 'book';
 // ─── Layout constants ─────────────────────────────────────────────────────────
 const W = 300;          // inner path column width (px)
 const CX = W / 2;      // center x
-const SPACING = 112;   // vertical distance between node centers (px)
-const PAD_TOP = 86;    // space above first node (for START tooltip)
-const PAD_BOT = 56;    // space below last node
+const SPACING = 110;   // vertical distance between node centers (px) - 120
+const PAD_TOP = 20;   // space above first node (for START tooltip) - 100
+const PAD_BOT = 20;    // space below last node - 64
 // Gentle Duolingo-like zigzag: stays close to center
 const OFFSETS = [0, -38, -58, -38, 0, 38, 58, 38];
 
@@ -121,6 +121,8 @@ function CircleNode({
   const current = status === 'current';
   const completed = status === 'completed';
 
+  // bg-[#2a3f50] shadow-[0_5px_0_#1a2c3a]
+
   const btn = (
     <motion.button
       whileHover={!locked ? { scale: 1.08, y: -2 } : undefined}
@@ -129,17 +131,17 @@ function CircleNode({
       disabled={locked}
       className={cn(
         'relative flex items-center justify-center rounded-full select-none',
-        current  && 'h-[76px] w-[76px] bg-[#58CC02] shadow-[0_5px_0_#46A302]',
-        completed && 'h-[68px] w-[68px] bg-[#58CC02] shadow-[0_5px_0_#46A302]',
-        locked   && 'h-[68px] w-[68px] bg-[#2a3f50] shadow-[0_5px_0_#1a2c3a] cursor-not-allowed',
+        current && 'h-19 w-19 bg-[#58CC02] shadow-[0_5px_0_#46A302]',
+        completed && 'h-17 w-17 bg-[#58CC02] shadow-[0_5px_0_#46A302]',
+        locked && 'h-17 w-17 bg-[#2a3f50] shadow-[0_5px_0_#D1D5DB] cursor-not-allowed',
       )}
     >
-      {type === 'star'  && <StarSvg  dim={locked} />}
+      {type === 'star' && <StarSvg dim={locked} />}
       {type === 'crown' && <CrownSvg dim={locked} />}
-      {type === 'book'  && <BookSvg  dim={locked} />}
+      {type === 'book' && <BookSvg dim={locked} />}
 
       {completed && score !== undefined && (
-        <span className="absolute -top-2 -right-1 min-w-[24px] h-6 flex items-center justify-center rounded-full bg-white px-1.5 text-[10px] font-extrabold text-[#46A302] shadow border border-[#46A302]/20">
+        <span className="absolute -top-2 -right-1 min-w-6 h-6 flex items-center justify-center rounded-full bg-white px-1.5 text-[10px] font-extrabold text-[#46A302] shadow border border-[#46A302]/20">
           {score}%
         </span>
       )}
@@ -175,18 +177,30 @@ export function DuolingoPath({ totalDays, results, onPlayDay, topic }: DuolingoP
     return Math.round((r.score / r.total_questions) * 100);
   };
 
-  const positions = Array.from({ length: totalDays }, (_, i) => ({
-    x: CX + OFFSETS[i % OFFSETS.length],
-    y: PAD_TOP + i * SPACING,
-  }));
+  // const positions = Array.from({ length: totalDays }, (_, i) => ({
+  //   x: CX + OFFSETS[i % OFFSETS.length],
+  //   y: PAD_TOP + i * SPACING,
+  // }));
+
+  const positions = Array.from({ length: totalDays }, (_, i) => {
+    const curve = Math.sin(i * 0.6) * 18;
+
+    return {
+      x: CX + OFFSETS[i % OFFSETS.length] + curve,
+      y: PAD_TOP + i * SPACING,
+    };
+  });
 
   const containerH = PAD_TOP + (totalDays - 1) * SPACING + 96 + PAD_BOT;
+
 
   // Mascot sits next to the node one step ahead of the current active one
   const mascotIdx = Math.min(currentDay + 1, totalDays - 1);
 
+  // bg-[#0f1f26]
+
   return (
-    <div className="w-full rounded-none lg:rounded-3xl bg-[#0f1f26] overflow-hidden">
+    <div className="w-full rounded-none lg:rounded-3xl bg-[#fafafa] overflow-hidden">
       {/* ── Centered path column ── */}
       <div className="relative mx-auto" style={{ width: W, height: containerH }}>
         {positions.map((pos, i) => {
@@ -211,7 +225,7 @@ export function DuolingoPath({ totalDays, results, onPlayDay, topic }: DuolingoP
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.045 + 0.25 }}
                   className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
-                  style={{ bottom: 'calc(100% + 10px)' }}
+                  style={{ bottom: 'calc(100% + 14px)' }}
                 >
                   <div className="bg-[#162533] text-white text-sm font-extrabold px-5 py-2 rounded-xl whitespace-nowrap border border-white/10 shadow-lg tracking-wide">
                     START
@@ -233,14 +247,17 @@ export function DuolingoPath({ totalDays, results, onPlayDay, topic }: DuolingoP
               )}
 
               {/* Day label */}
-              <span
-                className={cn(
-                  'absolute left-1/2 -translate-x-1/2 text-[11px] font-bold whitespace-nowrap select-none top-full mt-2',
-                  status === 'locked' ? 'text-[#3d5a6a]' : 'text-[#7fb5c8]',
-                )}
-              >
-                Day {i + 1}
-              </span>
+              {status !== 'current' && (
+                <span
+                  className={cn(
+                    'absolute left-1/2 -translate-x-1/2 text-[11px] font-bold whitespace-nowrap select-none top-full mt-3',
+                    status === 'locked' ? 'text-[#7fb5c8]' : 'text-[#3d5a6a]',
+                  )}
+                >
+                  Day {i + 1}
+                </span>
+              )}
+
 
               {/* Mascot (🦉) positioned to the open side of the turn */}
               {i === mascotIdx && (
@@ -263,13 +280,13 @@ export function DuolingoPath({ totalDays, results, onPlayDay, topic }: DuolingoP
 
       {/* ── Section divider ── */}
       <div className="flex items-center gap-3 px-6 pt-2 pb-7">
-        <div className="flex-1 h-px bg-white/10" />
+        <div className="flex-1 h-px bg-[#0f1f26]/10" />
         {topic && (
-          <span className="text-[11px] font-bold text-white/25 uppercase tracking-widest text-center shrink-0 max-w-[160px] leading-tight">
+          <span className="text-[11px] font-bold text-[#0f1f26]/25 uppercase tracking-widest text-center shrink-0 max-w-40 leading-tight">
             {topic}
           </span>
         )}
-        <div className="flex-1 h-px bg-white/10" />
+        <div className="flex-1 h-px bg-[#0f1f26]/10" />
       </div>
     </div>
   );
