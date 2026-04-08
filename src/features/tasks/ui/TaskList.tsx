@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar } from "lucide-react";
 import type { Task, Subject, CreateTaskPayload } from "@/shared/types";
 import { cn } from "@/shared/lib/utils";
 import { TaskCheckbox, TaskStatusBadge } from "@/entities/task";

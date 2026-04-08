@@ -1,6 +1,6 @@
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
 
-export async function streamTutorReply(messages: any[]) {
+export async function streamTutorReply(messages: []) {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
