@@ -31,9 +31,6 @@ export function Sidebar() {
     <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-[#131f24]">
       {/* Logo */}
       <div className="flex h-16 items-center gap-2.5 px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent">
-          <Sparkles className="h-5 w-5 text-[#2D2D2D]" />
-        </div>
         <span className="text-lg font-bold text-white">StudAI</span>
       </div>
 
